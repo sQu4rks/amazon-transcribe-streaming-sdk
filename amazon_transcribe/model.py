@@ -197,6 +197,13 @@ class StartStreamTranscriptionRequest:
         your AWS account. Provide the name in this field to successfully
         use it in a stream.
 
+    :param identify_language:
+        Flag to enable automatic language detection.
+
+    :param language_options:
+        List of language options when using the identify_language flag to 
+        automatically detect language.
+
     :param show_speaker_label:
         When true, enables speaker identification in your real-time stream.
 
@@ -240,6 +247,7 @@ class StartStreamTranscriptionRequest:
         show_speaker_label=None,
         enable_channel_identification=None,
         number_of_channels=None,
+        identify_language=None,
         enable_partial_results_stabilization=None,
         partial_results_stability=None,
         language_model_name=None,
@@ -262,6 +270,7 @@ class StartStreamTranscriptionRequest:
         ] = enable_partial_results_stabilization
         self.partial_results_stability: Optional[str] = partial_results_stability
         self.language_model_name: Optional[str] = language_model_name
+        self.identify_language: Optional[bool] = identify_language
 
 
 class StartStreamTranscriptionResponse:

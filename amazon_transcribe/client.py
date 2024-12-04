@@ -84,6 +84,8 @@ class TranscribeStreamingClient:
         enable_partial_results_stabilization: Optional[bool] = None,
         partial_results_stability: Optional[str] = None,
         language_model_name: Optional[str] = None,
+        identify_language: Optional[bool] = None,
+        language_options: Optional[List[str]] = None,
     ) -> StartStreamTranscriptionEventStream:
         """Coordinate transcription settings and start stream.
 
@@ -144,6 +146,7 @@ class TranscribeStreamingClient:
             overall transcription accuracy. Defaults to "high" if not set explicitly.
         :param language_model_name:
             The name of the language model you want to use.
+        ToDo(mneiding): Add correct doc string
         """
         transcribe_streaming_request = StartStreamTranscriptionRequest(
             language_code,
@@ -159,6 +162,8 @@ class TranscribeStreamingClient:
             enable_partial_results_stabilization,
             partial_results_stability,
             language_model_name,
+            identify_language=identify_language,
+            language_options=language_options,
         )
         endpoint = await self._endpoint_resolver.resolve(self.region)
 

@@ -106,6 +106,21 @@ class TranscribeStreamingSerializer:
             )
         )
         headers.update(
+            self._serialize_bool_header(
+                "identify-language",
+                request_shape.identify_language,
+            )
+        )
+
+        headers.update(
+            self._serialize_str_header(
+                "language-options",
+                request_shape.language_options,
+            )
+        )
+
+
+        headers.update(
             self._serialize_int_header(
                 "number-of-channels",
                 request_shape.number_of_channels,
