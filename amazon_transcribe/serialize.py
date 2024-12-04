@@ -56,6 +56,13 @@ class TranscribeStreamingSerializer:
     ) -> Dict[str, str]:
         return self._serialize_header(header, value)
 
+    def _serialize_str_list_header(
+        self, header: str, value: Optional[List[str]]
+    ) -> Dict[str, str]:
+        if value:
+            value: str = ",".join(value)
+        return self._serialize_header(header, value)
+
     def serialize_start_stream_transcription_request(
         self, endpoint: str, request_shape: StartStreamTranscriptionRequest
     ) -> Request:
@@ -113,7 +120,7 @@ class TranscribeStreamingSerializer:
         )
 
         headers.update(
-            self._serialize_str_header(
+            self._serialize_str_list_header(
                 "language-options",
                 request_shape.language_options,
             )
