@@ -23,6 +23,7 @@ from amazon_transcribe.model import (
     Result,
     Alternative,
     Item,
+    LanguageIdentification
 )
 from amazon_transcribe.response import Response
 from amazon_transcribe.exceptions import (
@@ -119,6 +120,12 @@ class TranscribeStreamingResponseParser:
             "x-amzn-transcribe-partial-results-stability"
         )
         language_model_name = headers.get("x-amzn-transcribe-language-model-name")
+        identify_language = self._raw_value_to_bool(
+            headers.get("x-amzn-transcribe-identify-language")
+        )
+        language_options = self._raw_value_to_list(
+            headers.get("x-amzn-transcribe-language-options")
+        )
 
         transcript_result_stream = TranscriptResultStream(
             body_stream, TranscribeStreamingEventParser()
@@ -140,6 +147,8 @@ class TranscribeStreamingResponseParser:
             enable_partial_results_stabilization=enable_partial_results_stabilization,
             partial_results_stability=partial_results_stability,
             language_model_name=language_model_name,
+            identify_language=identify_language,
+            language_options=language_options,
         )
         return parsed_response
 
@@ -151,6 +160,11 @@ class TranscribeStreamingResponseParser:
     def _raw_value_to_bool(self, value: Optional[str]) -> Optional[bool]:
         if value is not None:
             return ensure_boolean(value)
+        return None
+    
+    def _raw_value_to_list(self, value: Optional[str]) -> Optional[List[str]]:
+        if value:
+            return value.split(",")
         return None
 
 
@@ -180,6 +194,9 @@ class TranscribeStreamingEventParser:
 
     def _parse_result(self, current_node: Any) -> Result:
         alternatives = self._parse_alternative_list(current_node.get("Alternatives"))
+        language_identification = self._parse_language_identification(current_node.get("LanguageIdentification"))
+
+        
         return Result(
             result_id=current_node.get("ResultId"),
             start_time=current_node.get("StartTime"),
@@ -187,11 +204,22 @@ class TranscribeStreamingEventParser:
             is_partial=current_node.get("IsPartial"),
             alternatives=alternatives,
             channel_id=current_node.get("ChannelId"),
+            language_identification=language_identification
         )
 
     def _parse_alternative_list(self, current_node: Any) -> List[Alternative]:
         return [self._parse_alternative(e) for e in current_node]
 
+    def _parse_language_identification(self, current_node: Any) -> List[LanguageIdentification]:
+        ret: List[LanguageIdentification] = []
+        if current_node and isinstance(current_node, list):
+            for e in current_node:
+                l: LanguageIdentification = LanguageIdentification(language_code=e.get("LanguageCode"),
+                                                                   score= e.get("Score"))
+                ret.append(l)
+        if len(ret) >= 1:
+            return ret
+        return None
     def _parse_alternative(self, current_node: Any) -> Alternative:
         return Alternative(
             transcript=current_node.get("Transcript"),

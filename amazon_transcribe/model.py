@@ -118,6 +118,18 @@ class Item:
         self.confidence = confidence
         self.stable = stable
 
+class LanguageIdentification:
+    """The language identification for a transcription result.
+    
+    :param language_code: The language code that was detected.
+
+    :param score: The confidence score for the detected language.
+    """
+    def __init__(self, 
+                 language_code: str,
+                 score: float):
+        self.language_code = language_code
+        self.score = score
 
 class Result:
     """The result of transcribing a portion of the input audio stream.
@@ -148,6 +160,10 @@ class Result:
         the speech from each audio channel separately. You can use ChannelId
         to retrieve the transcription results for a single channel in your
         audio stream.
+    
+    :param language_identification:
+        The list of identified languages. Only present if language identification
+        was turned on.
     """
 
     def __init__(
@@ -158,6 +174,7 @@ class Result:
         is_partial: Optional[bool] = None,
         alternatives: Optional[List[Alternative]] = None,
         channel_id: Optional[str] = None,
+        language_identification: Optional[List[LanguageIdentification]] = None,
     ):
         self.result_id = result_id
         self.start_time = start_time
@@ -165,6 +182,7 @@ class Result:
         self.is_partial = is_partial
         self.alternatives = alternatives
         self.channel_id = channel_id
+        self.language_identification = language_identification
 
 
 class StartStreamTranscriptionRequest:
@@ -233,6 +251,12 @@ class StartStreamTranscriptionRequest:
         overall transcription accuracy.
     :param language_model_name:
         The name of the language model you want to use.
+    :param identify_language:
+        Flag to indicate if language identification should be used. If yes,
+        language_code must be None.
+    :param language_options:
+        The list of potential language codes (i.e. en-US) that should be 
+        used for language identification.
     """
 
     def __init__(
@@ -247,10 +271,11 @@ class StartStreamTranscriptionRequest:
         show_speaker_label=None,
         enable_channel_identification=None,
         number_of_channels=None,
-        identify_language=None,
         enable_partial_results_stabilization=None,
         partial_results_stability=None,
         language_model_name=None,
+        identify_language=None,
+        language_options=None,
     ):
 
         self.language_code: Optional[str] = language_code
@@ -270,7 +295,8 @@ class StartStreamTranscriptionRequest:
         ] = enable_partial_results_stabilization
         self.partial_results_stability: Optional[str] = partial_results_stability
         self.language_model_name: Optional[str] = language_model_name
-        self.identify_language: Optional[bool] = identify_language
+        self.identify_language: Optional[bool] = identify_language
+        self.language_options: Optional[List[str]] = language_options
 
 
 class StartStreamTranscriptionResponse:
@@ -342,6 +368,8 @@ class StartStreamTranscriptionResponse:
         enable_partial_results_stabilization=None,
         partial_results_stability=None,
         language_model_name=None,
+        identify_language=None,
+        language_options=None,
     ):
         self.request_id: Optional[str] = request_id
         self.language_code: Optional[str] = language_code
@@ -362,6 +390,8 @@ class StartStreamTranscriptionResponse:
         ] = enable_partial_results_stabilization
         self.partial_results_stability: Optional[str] = partial_results_stability
         self.language_model_name: Optional[str] = language_model_name
+        self.identify_language: Optional[bool] = identify_language
+        self.language_options: Optional[List[str]] = language_options
 
 
 class Transcript:

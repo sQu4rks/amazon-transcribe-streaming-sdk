@@ -14,7 +14,7 @@
 
 import re
 from binascii import unhexlify
-from typing import Optional
+from typing import Optional, List
 
 from amazon_transcribe import AWSCRTEventLoop
 from amazon_transcribe.auth import AwsCrtCredentialResolver, CredentialResolver
@@ -71,7 +71,7 @@ class TranscribeStreamingClient:
     async def start_stream_transcription(
         self,
         *,
-        language_code: str,
+        language_code: str = None,
         media_sample_rate_hz: int,
         media_encoding: str,
         vocabulary_name: Optional[str] = None,
